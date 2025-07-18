@@ -1,0 +1,9 @@
+[submodule "Micro-XRCE-DDS-Agent"]
+	path = Micro-XRCE-DDS-Agent
+	url = https://github.com/eProsima/Micro-XRCE-DDS-Agent.git
+[submodule "PX4-Autopilot_ASP"]
+	path = PX4-Autopilot_ASP
+	url = https://github.com/YoungRok-SON/PX4-Autopilot_ASP.git
+[submodule "utilities_pkg"]
+	path = utilities_pkg
+	url = https://github.com/YoungRok-SON/utilities_pkg.git
