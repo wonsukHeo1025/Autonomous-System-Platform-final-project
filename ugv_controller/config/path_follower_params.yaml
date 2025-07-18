@@ -1,0 +1,37 @@
+path_follower:
+  ros__parameters:
+    # mission_file은 launch 파일에서 동적으로 경로를 지정하는게 더 편해서 여기선 제외했다
+    # 만약 쓸거면
+    # mission_file: "/path/to/your/ws/src/ugv_controller/path/mission.csv"
+    # 이런식으로 하면 된다
+
+    max_speed: 5.5
+    waypoint_threshold: 0.7
+    speed_smoothing_factor: 0.03
+    curvature_gain: 2.0
+
+    # 속도 제어 PID 게인
+    speed:
+      kp: 1.5
+      ki: 0.0
+      kd: 0.2
+
+    # 조향 제어 PID 게인
+    steer:
+      kp: 4.0
+      ki: 0.0
+      kd: 0.1
+
+    # 정차 로직 관련 파라미터
+    stop_logic:
+      takeoff_cmd_speed_threshold: 3.0 # UAV 이륙 명령을 보내는 UGV 속도 임계값 (m/s)
+      deceleration_multiplier: 2.0     # 정차 시 감속 계수 (speed_smoothing_factor에 곱해짐)
+      stop_speed_threshold: 0.05       # 완전 정차로 간주하는 속도 임계값 (m/s)
+
+    # 구간별 속도 프로파일
+    speed_profile:
+      section_1_speed: 4.0  # 인덱스 3~5 구간 속도
+      section_2_speed: 5.5  # 인덱스 6~8 구간 속도
+      section_3_speed: 3.0  # 인덱스 9~14 구간 속도
+      section_4_speed: 2.0  # 인덱스 15~21 구간 속도
+      final_section_speed: 1.0  # 인덱스 23 이상 구간 속도

@@ -1,0 +1,41 @@
+uav_controller:
+  ros__parameters:
+
+    # 이륙 목표 고도 (미터)
+    target_takeoff_altitude: 5.0 
+
+    # UGV에 출발 신호를 보낼 이륙 고도 차이 임계값 (미터)
+    ugv_start_altitude_threshold: 1.0
+
+    # 이륙 완료 허용 오차 (m)
+    takeoff_altitude_tolerance: 2.0
+
+    # 웨이포인트 도착 판정 허용 거리 (미터)
+    waypoint_arrival_tolerance: 0.7
+
+    # 드론이 정지 상태로 간주되는 속도 임계값 (m/s)
+    stopped_velocity_threshold: 1.0
+
+    # 드론이 정지 상태로 간주되는 속도 임계값 (m/s)
+    stopped_velocity_threshold2: 0.1
+
+    # SET_POSE → SEARCHING 단계 전 자세 안정화 대기 시간 (초)
+    pose_stable_wait_seconds: 1
+
+    # SET_POSE → SEARCHING 단계 전 자세 안정화 대기 시간 (초)
+    pose_stable_wait_seconds2: 5
+
+    # 마커 검색 단계의 최대 대기 시간 (초)
+    marker_search_timeout_seconds: 1
+
+    # 랑데부 초기 대기 고도 (미터)
+    rendezvous_waiting_altitude: 3.0
+
+    # 랑데부 시 착륙 판정 고도 (미터)
+    rendezvous_landing_altitude: 1.1
+
+    # 랑데뷰 도착 허용 반경 (m)
+    rendezvous_arrival_tolerance: 1.0
+
+    # 랑데뷰 착륙 시 한 번에 하강할 거리 (m)
+    rendezvous_descent_distance: 0.7
