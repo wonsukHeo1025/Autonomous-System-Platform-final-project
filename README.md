@@ -5,10 +5,9 @@
 ## 프로젝트 개요
 하늘의 눈(UAV)과 땅의 발(UGV)이 만나, 인간이 접근하기 어려운 재난 상황 속에서 정보를 수집하는 ROS2 및 Gazebo 시뮬레이션 환경 기반의 재난 지역 탐사 프로젝트
 
-![image](https://github.com/user-attachments/assets/05c0f056-8759-4bab-bb83-4b3c6ba25cf8)
+<img width="166" height="165" alt="image" src="https://github.com/user-attachments/assets/d94317d4-eaf2-4df0-bdc6-cfd276f39026" />
 
-![image](https://github.com/user-attachments/assets/2a240d2c-8fde-43d9-b4c3-d03a5f92eac3)
-
+<img width="161" height="142" alt="image" src="https://github.com/user-attachments/assets/2bc4f20f-46f6-4ada-856c-8682b8f37878" />
 
 
 ## 프로젝트 소개
@@ -95,3 +94,10 @@ pose_tf_broadcaster.launch.py에서는 C++ 노드와 별개로, tf2_ros의 stati
    terminal2: ros2 launch uav_controller uav_controller
    terminal3: ros2 launch ugv_controller path_follower_node
    ```
+
+---
+
+## 결과 시각화
+<img width="353" height="246" alt="image" src="https://github.com/user-attachments/assets/af639ed2-8b81-4b48-b5fb-392992d1e8f4" />
+<img width="252" height="245" alt="image" src="https://github.com/user-attachments/assets/2c8b87b1-adde-491d-b1bc-fea41db96ab5" />
+<img width="625" height="351" alt="image" src="https://github.com/user-attachments/assets/790a0cbc-76da-4f7f-8053-994125df2ce9" />
