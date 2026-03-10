@@ -2,7 +2,14 @@
 
 ## 개요
 
-이 저장소는 ROS 2, Gazebo, PX4 기반 UAV-UGV 협력 탐사 프로젝트에서 제가 담당한 모듈을 정리한 워크스페이스입니다.
+<img width="166" height="165" alt="image" src="https://github.com/user-attachments/assets/d94317d4-eaf2-4df0-bdc6-cfd276f39026" />
+
+<img width="161" height="142" alt="image" src="https://github.com/user-attachments/assets/2bc4f20f-46f6-4ada-856c-8682b8f37878" />
+
+<img width="166" height="148" alt="image" src="https://github.com/user-attachments/assets/3d9cd40b-2c20-45fa-a211-f179059c4dbf" />
+
+<img width="161" height="134" alt="image" src="https://github.com/user-attachments/assets/56222433-fd8f-4e62-afac-baaa1154a229" />
+
 
 제 담당 범위는 다음 두 영역에 집중되어 있습니다.
 
