@@ -1,5 +1,162 @@
 # UAV-UGV Cooperation-Based Autonomous System Platform
 
+## 개요
+
+이 저장소는 ROS 2, Gazebo, PX4 기반 UAV-UGV 협력 탐사 프로젝트에서 제가 담당한 모듈을 정리한 워크스페이스입니다.
+
+제 담당 범위는 다음 두 영역에 집중되어 있습니다.
+
+- UGV 경로 추종 및 미션 구간 제어
+- UAV 착륙을 위한 ArUco 마커 인지 모듈
+
+이 README는 제가 직접 구현한 `ugv_controller` 패키지 전체와 `uav_controller/src/aruco_uav.cpp`를 포트폴리오 관점에서 설명하기 위한 문서입니다. UAV 전체 미션 상태기계, PX4 오프보드 비행 제어, Gazebo 환경 구성, TF 브리지 구성은 프로젝트 전체에는 포함되지만 제 담당 범위는 아니므로 여기서는 분리해서 설명합니다.
+
+## 담당 범위
+
+| 영역 | 패키지/모듈 | 구현한 내용 |
+|---|---|---|
+| Ground Control | [`ugv_controller`](./ugv_controller) | `mission.csv` 기반 경로 추종, TF 기반 UGV pose 추정, PID 속도/조향 제어, 곡률 기반 속도 조절, 이륙 지점 정차 로직, UAV 이륙/랑데부 신호 송수신 |
+| UAV Vision | [`uav_controller/src/aruco_uav.cpp`](./uav_controller/src/aruco_uav.cpp) | 카메라 영상 기반 ArUco 검출, `CameraInfo` 보정값 반영, OpenCV pose 추정, 카메라-기체 오프셋 보정, TF 기반 `map` 좌표 변환, 디버그 이미지 발행 |
+
+## 담당 범위 제외
+
+아래 항목들은 전체 시스템에는 포함되지만 제 담당 범위는 아니었습니다.
+
+- `uav_controller/src/uav_controller.cpp`
+- PX4 오프보드 비행 제어 스택
+- Gazebo 환경 세팅 및 TF 브리지
+- `Micro-XRCE-DDS-Agent`
+- `PX4-Autopilot_ASP`
+- `utilities_pkg`
+
+## 시스템 목표
+
+제가 맡은 모듈 기준으로 이 시스템은 다음 흐름을 수행하도록 설계되었습니다.
+
+- UGV가 미리 정의된 지상 경로를 따라 UAV 탑재 상태로 이동
+- 지정된 waypoint에서 감속 및 정차 후 UAV 이륙 신호 전송
+- UAV 이륙 완료 신호를 수신하면 UGV가 다음 경로를 계속 주행
+- 전체 지상 미션 종료 후 UGV가 UAV에 rendezvous 시작 신호 전송
+- UAV 하향 카메라에서 ArUco 마커를 검출하고 `map` 기준 위치를 추정해 정밀 착륙 인지 기반 제공
+
+## End-To-End 파이프라인
+
+```mermaid
+flowchart LR
+    A["UGV mission.csv"] --> B[ugv_controller]
+    C["TF: map -> X1_asp/base_link"] --> B
+    D["/status/drone_ready"] --> B
+    E["/status/takeoff_complete"] --> B
+    B --> F["/model/X1_asp/cmd_vel"]
+    B --> G["/command/takeoff"]
+    B --> H["/command/rendezvous"]
+    B --> I["current_pose / target_marker"]
+
+    J["Gazebo camera image"] --> K[aruco_uav.cpp]
+    L["CameraInfo"] --> K
+    M["TF: x500_gimbal_0 <-> camera_link"] --> K
+    K --> N["/offboard_control/image_proc"]
+    K --> O["Marker absolute pose in map frame (log)"]
+```
+
+## 주요 기능
+
+### 1. UGV 경로 추종 및 미션 제어
+
+- `mission.csv` 기반 waypoint 로딩
+- TF에서 `map -> X1_asp/base_link`를 조회해 현재 위치와 yaw 추정
+- PID 기반 속도 및 조향 제어
+- waypoint 곡률 기반 속도 조절
+- waypoint index 구간별 속도 프로파일 적용
+- UAV 이륙 지점에서 감속, 정차, 이륙 신호 송신
+- UAV 이륙 완료 후 다음 waypoint로 재출발
+- 전체 지상 미션 종료 후 rendezvous 신호 발행
+
+### 2. UAV 착륙용 ArUco 인지
+
+- Gazebo 카메라 이미지와 `CameraInfo` 구독
+- OpenCV ArUco 검출 및 `estimatePoseSingleMarkers` 기반 자세 추정
+- OpenCV 좌표계 결과를 ROS/TF 좌표계로 변환
+- 카메라와 기체 기준점 사이 오프셋을 반영한 상대 위치 보정
+- TF를 사용해 마커 pose를 `map` 기준 절대 좌표로 변환
+- 디버그용 processed image 발행
+
+## 패키지별 요약
+
+### `ugv_controller`
+
+이 패키지는 제가 맡은 지상 이동 제어의 핵심입니다. UGV의 현재 pose를 TF에서 읽고, 미리 정의된 waypoint를 추종하면서 UAV와의 협업 시점을 관리합니다.
+
+- 주요 파일:
+  - `ugv_controller/src/path_follower_node.cpp`
+  - `ugv_controller/config/path_follower_params.yaml`
+  - `ugv_controller/launch/path_follower.launch.py`
+  - `ugv_controller/path/mission.csv`
+- 입력:
+  - `mission.csv`
+  - TF `map -> X1_asp/base_link`
+  - `/status/drone_ready`
+  - `/status/takeoff_complete`
+- 주요 출력:
+  - `/model/X1_asp/cmd_vel`
+  - `/command/takeoff`
+  - `/command/rendezvous`
+  - `current_pose`
+  - `target_marker`
+
+### `uav_controller/src/aruco_uav.cpp`
+
+이 모듈은 UAV 착륙 단계에서 사용할 ArUco 기반 시각 인지 모듈입니다. 카메라 영상에서 마커를 검출하고, 마커 위치를 `map` 좌표계로 변환해 정밀 착륙 판단의 기반 정보를 제공합니다.
+
+- 주요 파일:
+  - `uav_controller/src/aruco_uav.cpp`
+- 입력:
+  - `/world/default/model/x500_gimbal_0/link/camera_link/sensor/camera/image`
+  - `/world/default/model/x500_gimbal_0/link/camera_link/sensor/camera/camera_info`
+  - TF `x500_gimbal_0 <-> x500_gimbal_0/camera_link`
+- 주요 출력:
+  - `/offboard_control/image_proc`
+  - `map` 기준 마커 절대 위치 로그
+
+## 저장소 구조
+
+```text
+.
+├── ugv_controller
+│   ├── config
+│   ├── launch
+│   ├── path
+│   └── src
+│       └── path_follower_node.cpp
+└── uav_controller
+    └── src
+        ├── aruco_uav.cpp
+        └── uav_controller.cpp
+```
+
+## 기술 스택
+
+- ROS 2 Humble
+- Gazebo Classic
+- PX4 message interface
+- C++
+- TF2
+- OpenCV ArUco
+
+## 요약
+
+이 프로젝트에서 제가 맡은 부분은 UAV-UGV 협력 시스템의 지상 이동 제어와 UAV 착륙 인지였습니다.
+
+- UGV waypoint 추종 및 속도 제어
+- UAV 이륙 지점 정차 및 신호 연동
+- rendezvous 시작 신호 처리
+- UAV 카메라 기반 ArUco 마커 검출
+- TF 기반 마커 절대 위치 추정
+
+
+
+# UAV-UGV Cooperation-Based Autonomous System Platform
+
 
 
 ## 프로젝트 개요
