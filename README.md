@@ -83,7 +83,7 @@ flowchart LR
 
 ### `ugv_controller`
 
-이 패키지는 제가 맡은 지상 이동 제어의 핵심입니다. UGV의 현재 pose를 TF에서 읽고, 미리 정의된 waypoint를 추종하면서 UAV와의 협업 시점을 관리합니다.
+이 패키지는 지상 이동 제어를 맡습니다. UGV의 현재 pose를 TF에서 읽고, 미리 정의된 waypoint를 추종합니다.
 
 - 주요 파일:
   - `ugv_controller/src/path_follower_node.cpp`
@@ -104,7 +104,7 @@ flowchart LR
 
 ### `uav_controller/src/aruco_uav.cpp`
 
-이 모듈은 UAV 착륙 단계에서 사용할 ArUco 기반 시각 인지 모듈입니다. 카메라 영상에서 마커를 검출하고, 마커 위치를 `map` 좌표계로 변환해 정밀 착륙 판단의 기반 정보를 제공합니다.
+이 모듈은 UAV 착륙 단계에서 사용할 ArUco 기반 시각 인지 모듈입니다. 카메라 영상에서 마커를 검출하고, 마커 위치를 map 좌표계로 변환합니다.
 
 - 주요 파일:
   - `uav_controller/src/aruco_uav.cpp`
@@ -142,8 +142,6 @@ flowchart LR
 - OpenCV ArUco
 
 ## 요약
-
-이 프로젝트에서 제가 맡은 부분은 UAV-UGV 협력 시스템의 지상 이동 제어와 UAV 착륙 인지였습니다.
 
 - UGV waypoint 추종 및 속도 제어
 - UAV 이륙 지점 정차 및 신호 연동
