@@ -11,9 +11,9 @@
 <img width="161" height="134" alt="image" src="https://github.com/user-attachments/assets/56222433-fd8f-4e62-afac-baaa1154a229" />
 
 
-제 담당은 UGV 경로 추종 및 미션 구간 제어와 UAV 착륙을 위한 ArUco 마커 인지 모듈 구현입니다.
+담당: UGV 경로 추종 및 미션 구간 제어 + UAV에서의 ArUco 마커 인지 모듈 구현
 
-이 README는 직접 구현한 ugv_controller 패키지 전체와 uav_controller/src/aruco_uav.cpp를 포트폴리오 관점에서 설명하기 위한 문서입니다. UAV 전체 미션 상태기계, PX4 오프보드 비행 제어, Gazebo 환경 구성, TF 브리지 구성은 프로젝트 전체에는 포함되지만 제 담당 범위는 아니므로 여기서는 분리해서 설명합니다.
+이 README는 직접 구현한 ugv_controller 패키지 전체와 uav_controller/src/aruco_uav.cpp를 설명하기 위한 문서입니다. UAV 전체 미션 상태기계, PX4 오프보드 비행 제어, Gazebo 환경 구성, TF 브리지 구성은 프로젝트 전체에는 포함되지만 제 담당 범위는 아니므로 여기서는 설명하지 않습니다.
 
 ## 담당 범위
 
@@ -22,16 +22,6 @@
 | Ground Control | [`ugv_controller`](./ugv_controller) | `mission.csv` 기반 경로 추종, TF 기반 UGV pose 추정, PID 속도/조향 제어, 곡률 기반 속도 조절, 이륙 지점 정차 로직, UAV 이륙/랑데부 신호 송수신 |
 | UAV Vision | [`uav_controller/src/aruco_uav.cpp`](./uav_controller/src/aruco_uav.cpp) | 카메라 영상 기반 ArUco 검출, `CameraInfo` 보정값 반영, OpenCV pose 추정, 카메라-기체 오프셋 보정, TF 기반 `map` 좌표 변환, 디버그 이미지 발행 |
 
-## 담당 범위 제외
-
-아래 항목들은 전체 시스템에는 포함되지만 제 담당 범위는 아니었습니다.
-
-- `uav_controller/src/uav_controller.cpp`
-- PX4 오프보드 비행 제어 스택
-- Gazebo 환경 세팅 및 TF 브리지
-- `Micro-XRCE-DDS-Agent`
-- `PX4-Autopilot_ASP`
-- `utilities_pkg`
 
 ## 시스템 목표
 
@@ -41,6 +31,7 @@
 - 지정된 waypoint에서 감속 및 정차 후 UAV 이륙 신호 전송
 - UAV 이륙 완료 신호를 수신하면 UGV가 다음 경로를 계속 주행
 - 전체 지상 미션 종료 후 UGV가 UAV에 rendezvous 시작 신호 전송
+- UAV는 탐사 지역을 비행하며 아루코 마커 발견 시 촬영 후 좌표 추출
 - UAV 하향 카메라에서 ArUco 마커를 검출하고 `map` 기준 위치를 추정해 정밀 착륙 인지 기반 제공
 
 ## End-To-End 파이프라인
